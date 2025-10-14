@@ -1,209 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { useDocumentOfficiality, docType } from './useDocumentOfficiality';
 import Alert from './Alert.vue';
 
-interface officiality {
-  is: boolean | null
-  outOfScope: boolean
-  reason: string
-}
+// Use the composable
+const { state, documentOfficiality, resetAll } = useDocumentOfficiality();
 
-enum type {
-  Ledger = 'ledger',
-  CourtRuling = 'court-ruling',
-  Record = 'record',
-  Other = 'other',
-}
-
-const documentHeldByAuthority = ref<boolean | null>(null);
-const documentBackupEtc = ref<boolean | null>(null);
-const documentTransferredWithinAuth = ref<boolean | null>(null);
-const documentCompetition = ref<boolean | null>(null);
-const documentHasArrived = ref<boolean | null>(null);
-
-// Path: The document has arrived to the authority
-const documentDirectedToOfficial = ref<boolean | null>(null);
-const documentRefersToCase = ref<boolean | null>(null);
-const documentWorkingMaterial = ref<boolean | null>(null);
-
-// Path: The document has NOT arrived to the authority
-const documentType = ref<type | null>(null);
-
-// Path: Ledger
-const documentReadyForNotation = ref<boolean | null>(null);
-
-// Path: CourtRuling
-const documentDecisionAnnounced = ref<boolean | null>(null);
-
-// Path: Record
-const documentRiskdagRecord = ref<boolean | null>(null);
-const documentApproved = ref<boolean | null>(null);
-
-// Path: Other
-const documentOtherWorkingMaterial = ref<boolean | null>(null);
-const documentDispatched = ref<boolean | null>(null);
-const documentSpecificMatter = ref<boolean | null>(null);
-const documentOtherApproved = ref<boolean | null>(null);
-const documentMemoranda = ref<boolean | null>(null);
-const documentSettled = ref<boolean | null>(null);
-const doucmentArchived = ref<boolean | null>(null);
-
-const documentOfficiality = computed<officiality | null>(() => {
-  if (documentHeldByAuthority.value === false) {
-    return { is: false, outOfScope: false, reason: "Document must be held by authority or public body to be considered for officiality." };
-  }
-
-  if (documentBackupEtc.value === true) {
-    return { is: false, outOfScope: false, reason: "see Ch 2, art 13 ph 2 and 14 p. 1, 2, 3 for further information on this concrete matter." };
-  }
-
-  if (documentTransferredWithinAuth.value === true) {
-    return { is: null, outOfScope: true, reason: "see Ch 2 art 11 FPA for further information on this concrete matter." };
-  }
-
-  if (documentCompetition.value === true) {
-    return { is: null, outOfScope: true, reason: "see Ch 2, art 9 ph 2 FPA for further information on this concrete matter." };
-  }
-
-  if (documentHasArrived.value === true) { // the document has arrived 
-    if (documentDirectedToOfficial.value === true) { // the document is directed to an official
-
-      if (documentRefersToCase.value === true) {
-        return { is: true, outOfScope: false, reason: "see Ch 2, art 4 and 9 FPA for further information on this concrete matter." };
-      }
-
-      if (documentRefersToCase.value === false) {
-        return { is: false, outOfScope: false, reason: "see Ch 2, art 8 FPA for further information on this concrete matter." };
-      }
-
-    } else if (documentDirectedToOfficial.value === false) { // the document is NOT directed to an official
-
-      if (documentWorkingMaterial.value === true) {
-        return { is: false, outOfScope: false, reason: "see Ch 2 art 12 ph 2 FPA for further information on this concrete matter." };
-      }
-
-      if (documentWorkingMaterial.value === false) {
-        return { is: true, outOfScope: false, reason: "see Ch 2 art 4 and 9 FPA for further information on this concrete matter." };
-      }
-
-    }
-  } else if (documentHasArrived.value === false) { // the document has NOT arrived
-    switch (documentType.value) {
-      case type.Ledger:
-        if (documentReadyForNotation.value === true) {
-          return { is: true, outOfScope: false, reason: "see Ch 2, art 10 ph 2 p. 1 FPA for further information on this concrete matter." };
-        }
-        if (documentReadyForNotation.value === false) {
-          return { is: false, outOfScope: false, reason: "see Ch 2, art 10 ph 2 p. 1 for further information on this concrete matter." };
-        }
-        break;
-      case type.CourtRuling:
-        if (documentDecisionAnnounced.value === true) {
-          return { is: true, outOfScope: false, reason: "see Ch 2, art 10 ph 2 p. 2 FPA for further information on this concrete matter." };
-        }
-        if (documentDecisionAnnounced.value === false) {
-          return { is: false, outOfScope: false, reason: "see Ch 2, art 10 ph 2 p. 2 FPA for further information on this concrete matter." };
-        }
-        break;
-      case type.Record:
-        if (documentRiskdagRecord.value === false) {
-          if (documentApproved.value === true) {
-            return { is: true, outOfScope: false, reason: "see Ch 2, art 10 ph 2 p. 3 FPA for further information on this concrete matter." };
-          }
-          if (documentApproved.value === false) {
-            return { is: false, outOfScope: false, reason: "see Ch 2, art 10 ph 2 p. 3 FPA for further information on this concrete matter." };
-          }
-          break; // no fall-through
-        }
-        if (documentRiskdagRecord.value === null) {
-          break; // no fall-through
-        }
-      // intended fall-through (if documentRiskdagRecord is true)
-      case type.Other:
-        if (documentOtherWorkingMaterial.value === true) {
-          return { is: false, outOfScope: false, reason: "see Ch 2, art 12 ph 2 FPA for further information on this concrete matter." };
-        } else if (documentOtherWorkingMaterial.value === null) {
-          return null; // skip
-        }
-
-        // documentOtherWorkingMaterial.value === false at this point
-
-        if (documentDispatched.value === true) {
-          return { is: true, outOfScope: false, reason: "see Ch 2, art 4 and 10 ph. 1 for further information on this concrete matter." };
-        } else if (documentDispatched.value === null) {
-          return null;
-        }
-
-        // documentDispatched.value === false at this point
-
-        if (documentSpecificMatter.value === true) {
-          if (documentMemoranda.value === true) {
-            if (doucmentArchived.value === true) {
-              return { is: true, outOfScope: false, reason: "see Ch 2, art 4 and 12 ph 1 FPA for further information on this concrete matter." };
-            }
-            if (doucmentArchived.value === false) {
-              return { is: false, outOfScope: false, reason: "see Ch 2, art 4 and 12 ph 1 FPA for further information on this concrete matter." };
-            }
-          }
-
-          if (documentMemoranda.value === false) {
-            if (documentSettled.value === true) {
-              return { is: true, outOfScope: false, reason: "see Ch 2, art 4 and 10 ph. 1 FPA for further information on this concrete matter." };
-            }
-            if (documentSettled.value === false) {
-              return { is: false, outOfScope: false, reason: "see Ch 2, art 4 and 10 FPA for further information on this concrete matter." };
-            }
-          }
-        }
-
-        if (documentSpecificMatter.value === false) {
-          if (documentOtherApproved.value === true) {
-            return { is: true, outOfScope: false, reason: "see Ch 2, art 4 and 10 FPA for further information on this concrete matter." };
-          }
-          if (documentOtherApproved.value === false) {
-            return { is: false, outOfScope: false, reason: "see Ch 2, art 4 and 10 for further information on this concrete matter." };
-          }
-        }
-    }
-  }
-
-  return null;
-})
-
-function resetAll() {
-  documentHeldByAuthority.value = null;
-  documentBackupEtc.value = null;
-  documentTransferredWithinAuth.value = null;
-  documentCompetition.value = null;
-  documentHasArrived.value = null;
-
-  // Path: The document has arrived to the authority
-  documentDirectedToOfficial.value = null;
-  documentRefersToCase.value = null;
-  documentWorkingMaterial.value = null;
-
-  // Path: The document has NOT arrived to the authority
-  documentType.value = null;
-
-  // Path: Ledger
-  documentReadyForNotation.value = null;
-
-  // Path: CourtRuling
-  documentDecisionAnnounced.value = null;
-
-  // Path: Record
-  documentRiskdagRecord.value = null;
-  documentApproved.value = null;
-
-  // Path: Other
-  documentOtherWorkingMaterial.value = null;
-  documentDispatched.value = null;
-  documentSpecificMatter.value = null;
-  documentOtherApproved.value = null;
-  documentMemoranda.value = null;
-  documentSettled.value = null;
-  doucmentArchived.value = null;
-}
+// Expose type enum to the template
+const documentType = docType;
 
 </script>
 
@@ -223,7 +26,7 @@ function resetAll() {
       <h4>Is the document held by an authority?</h4>
       (I) "held by an authority" means whether the document is in physical posession by a governmental or public body.
       (Ch 2, art 4 and 5 FPA)
-      <select name="document-held-by-authority" required v-model="documentHeldByAuthority">
+      <select name="document-held-by-authority" required v-model="state.heldByAuthority">
         <option selected disabled :value="null">
           Yes/No
         </option>
@@ -232,7 +35,7 @@ function resetAll() {
       </select>
     </label>
 
-    <div v-if="documentHeldByAuthority === true">
+    <div v-if="state.heldByAuthority === true">
       <label>
         <hr />
         <h4>Is the document:</h4>
@@ -248,7 +51,7 @@ function resetAll() {
             above?</li>
         </ul>
         (I) Ch 2, art 13 ph 2 and 14 p. 1, 2, 3
-        <select name="document-backup-etc" required v-model="documentBackupEtc">
+        <select name="document-backup-etc" required v-model="state.backupEtc">
           <option selected disabled :value="null">
             Yes/No
           </option>
@@ -257,12 +60,12 @@ function resetAll() {
         </select>
       </label>
 
-      <div v-if="documentBackupEtc === false">
+      <div v-if="state.backupEtc === false">
         <label>
           <hr />
           <h4>Is it a document that a public authority has transferred to another body within the same authority?</h4>
           (I) Ch 2 art 11 FPA
-          <select name="document-transferred-within-auth" required v-model="documentTransferredWithinAuth">
+          <select name="document-transferred-within-auth" required v-model="state.transferredWithinAuth">
             <option selected disabled :value="null">
               Yes/No
             </option>
@@ -271,7 +74,7 @@ function resetAll() {
           </select>
         </label>
 
-        <div v-if="documentTransferredWithinAuth === false">
+        <div v-if="state.transferredWithinAuth === false">
           <label>
             <hr />
             <h4>Is the document a competition document, tender or other such document which has been advertised and
@@ -279,7 +82,7 @@ function resetAll() {
               be
               delivered under sealed cover?</h4>
             (I) Ch 2, art 9 ph 2 FPA
-            <select name="document-competition" required v-model="documentCompetition">
+            <select name="document-competition" required v-model="state.competition">
               <option selected disabled :value="null">
                 Yes/No
               </option>
@@ -288,12 +91,12 @@ function resetAll() {
             </select>
           </label>
 
-          <div v-if="documentCompetition === false">
+          <div v-if="state.competition === false">
             <label>
               <hr />
               <h4>The document has arrived to the authority or is in the hands of a competent official</h4>
               (I) Ch 2, art 9 FPA
-              <select name="document-has-arrived" required v-model="documentHasArrived">
+              <select name="document-has-arrived" required v-model="state.hasArrived">
                 <option selected disabled :value="null">
                   Yes/No
                 </option>
@@ -302,15 +105,14 @@ function resetAll() {
               </select>
             </label>
 
-            <!-- Path: The document has arrived to the authority -->
-            <div v-if="documentHasArrived === true">
+            <div v-if="state.hasArrived === true">
               <label>
                 <hr />
                 <h4>Is the document a letter or other communication which is directed in person to an official at a
                   public
                   authority</h4>
                 (I) Ch 2, art 8 FPA
-                <select name="document-directed-to-official" required v-model="documentDirectedToOfficial">
+                <select name="document-directed-to-official" required v-model="state.paths.arrived.directedToOfficial">
                   <option selected disabled :value="null">
                     Yes/No
                   </option>
@@ -319,14 +121,14 @@ function resetAll() {
                 </select>
               </label>
 
-              <div v-if="documentDirectedToOfficial === true">
+              <div v-if="state.paths.arrived.directedToOfficial === true">
                 <label>
                   <hr />
                   <h4>Does the document refer to a case or other matter falling within the authorities purview, and is
                     not
                     intended for the addressee solely in his/her capacity as holder of another position?</h4>
                   (I) Ch 2, art 8 FPA
-                  <select name="document-refers-to-case" required v-model="documentRefersToCase">
+                  <select name="document-refers-to-case" required v-model="state.paths.arrived.refersToCase">
                     <option selected disabled :value="null">
                       Yes/No
                     </option>
@@ -336,12 +138,12 @@ function resetAll() {
                 </label>
               </div>
 
-              <div v-else-if="documentDirectedToOfficial === false">
+              <div v-else-if="state.paths.arrived.directedToOfficial === false">
                 <label>
                   <hr />
                   <h4>Is it working material that has been received for the purpose of obtain comments?</h4>
                   (I) Ch 2 art 12 ph 2 FP
-                  <select name="document-working-material" required v-model="documentWorkingMaterial">
+                  <select name="document-working-material" required v-model="state.paths.arrived.workingMaterial">
                     <option selected disabled :value="null">
                       Yes/No
                     </option>
@@ -352,8 +154,7 @@ function resetAll() {
               </div>
             </div>
 
-            <!-- Path: The document has NOT arrived to the authority -->
-            <div v-else-if="documentHasArrived === false">
+            <div v-else-if="state.hasArrived === false">
               <label>
                 <hr />
                 <h4>What type of document is it?</h4>
@@ -374,21 +175,21 @@ function resetAll() {
                     <b>Other*:</b> Others...
                   </li>
                 </ul>
-                <select name="document-working-material" required v-model="documentType">
+                <select name="document-working-material" required v-model="state.paths.notArrived.docType">
                   <option selected disabled :value="null">
                     Choose...
                   </option>
-                  <option :value="type.Ledger">Ledger*</option>
-                  <option :value="type.CourtRuling">Court Ruling*</option>
-                  <option :value="type.Record">Memoranda*</option>
-                  <option :value="type.Other">Other*</option>
+                  <option :value="documentType.Ledger">Ledger*</option>
+                  <option :value="documentType.CourtRuling">Court Ruling*</option>
+                  <option :value="documentType.Record">Memoranda*</option>
+                  <option :value="documentType.Other">Other*</option>
                 </select>
               </label>
 
-              <label v-if="documentType === type.Ledger">
+              <label v-if="state.paths.notArrived.docType === documentType.Ledger">
                 <hr />
                 <h4>Has the document been made ready for notation or entry?</h4>
-                <select name="document-ready-for-notation" required v-model="documentReadyForNotation">
+                <select name="document-ready-for-notation" required v-model="state.paths.notArrived.readyForNotation">
                   <option selected disabled :value="null">
                     Yes/No
                   </option>
@@ -397,10 +198,10 @@ function resetAll() {
                 </select>
               </label>
 
-              <label v-if="documentType === type.CourtRuling">
+              <label v-if="state.paths.notArrived.docType === documentType.CourtRuling">
                 <hr />
                 <h4>Has the decision been announced or dispatched?</h4>
-                <select name="document-decision-announced" required v-model="documentDecisionAnnounced">
+                <select name="document-decision-announced" required v-model="state.paths.notArrived.decisionAnnounced">
                   <option selected disabled :value="null">
                     Yes/No
                   </option>
@@ -409,7 +210,7 @@ function resetAll() {
                 </select>
               </label>
 
-              <div v-if="documentType === type.Record">
+              <div v-if="state.paths.notArrived.docType === documentType.Record">
                 <label>
                   <hr />
                   <h4>Is it records of Riksdag committees, auditors of local authorities, government-appointed
@@ -420,7 +221,7 @@ function resetAll() {
                     for
                     decision</h4>
                   (I) Ch 2, art 10 ph 3 FPA
-                  <select name="document-riskdag-record" required v-model="documentRiskdagRecord">
+                  <select name="document-riskdag-record" required v-model="state.paths.notArrived.riskdagRecord">
                     <option selected disabled :value="null">
                       Yes/No
                     </option>
@@ -429,12 +230,12 @@ function resetAll() {
                   </select>
                 </label>
 
-                <label v-if="documentRiskdagRecord === false">
+                <label v-if="state.paths.notArrived.riskdagRecord === false">
                   <hr />
                   <h4>Has the document been finally checked and approved by authority or has otherwise received final
                     form?
                   </h4>
-                  <select name="document-approved" required v-model="documentApproved">
+                  <select name="document-approved" required v-model="state.paths.notArrived.approved">
                     <option selected disabled :value="null">
                       Yes/No
                     </option>
@@ -445,11 +246,12 @@ function resetAll() {
               </div>
 
               <div
-                v-if="(documentType === type.Record && documentRiskdagRecord === true) || documentType === type.Other">
+                v-if="(state.paths.notArrived.docType === documentType.Record && state.paths.notArrived.riskdagRecord === true) || state.paths.notArrived.docType === documentType.Other">
                 <label>
                   <hr />
                   <h4>Is it working material that has been sent with the purpose of obtain comments?</h4>
-                  <select name="document-other-working-material" required v-model="documentOtherWorkingMaterial">
+                  <select name="document-other-working-material" required
+                    v-model="state.paths.notArrived.otherWorkingMaterial">
                     <option selected disabled :value="null">
                       Yes/No
                     </option>
@@ -458,11 +260,11 @@ function resetAll() {
                   </select>
                 </label>
 
-                <div v-if="documentOtherWorkingMaterial === false">
+                <div v-if="state.paths.notArrived.otherWorkingMaterial === false">
                   <label>
                     <hr />
                     <h4>Has the document been dispatched?</h4>
-                    <select name="document-dispatched" required v-model="documentDispatched">
+                    <select name="document-dispatched" required v-model="state.paths.notArrived.dispatched">
                       <option selected disabled :value="null">
                         Yes/No
                       </option>
@@ -471,11 +273,11 @@ function resetAll() {
                     </select>
                   </label>
 
-                  <div v-if="documentDispatched === false">
+                  <div v-if="state.paths.notArrived.dispatched === false">
                     <label>
                       <hr />
                       <h4>Does the document relate to a specific matter?</h4>
-                      <select name="document-specific-matter" required v-model="documentSpecificMatter">
+                      <select name="document-specific-matter" required v-model="state.paths.notArrived.specificMatter">
                         <option selected disabled :value="null">
                           Yes/No
                         </option>
@@ -484,12 +286,12 @@ function resetAll() {
                       </select>
                     </label>
 
-                    <div v-if="documentSpecificMatter === true">
+                    <div v-if="state.paths.notArrived.specificMatter === true">
                       <label>
                         <hr />
                         <h4>Is the document a memoranda?</h4>
                         (I) Ch 2, art 12 ph 1 FPA
-                        <select name="document-memoranda" required v-model="documentMemoranda">
+                        <select name="document-memoranda" required v-model="state.paths.notArrived.memoranda">
                           <option selected disabled :value="null">
                             Yes/No
                           </option>
@@ -498,10 +300,10 @@ function resetAll() {
                         </select>
                       </label>
 
-                      <label v-if="documentMemoranda === true">
+                      <label v-if="state.paths.notArrived.memoranda === true">
                         <hr />
                         <h4>Is the memoranda archived?</h4>
-                        <select name="document-archived" required v-model="doucmentArchived">
+                        <select name="document-archived" required v-model="state.paths.notArrived.documentArchived">
                           <option selected disabled :value="null">
                             Yes/No
                           </option>
@@ -510,11 +312,11 @@ function resetAll() {
                         </select>
                       </label>
 
-                      <label v-if="documentMemoranda === false">
+                      <label v-if="state.paths.notArrived.memoranda === false">
                         <hr />
                         <h4>Has the matter been settled by the authority?</h4>
                         (I) Ch 2, art 10 ph 1 FPA
-                        <select name="document-settled" required v-model="documentSettled">
+                        <select name="document-settled" required v-model="state.paths.notArrived.settled">
                           <option selected disabled :value="null">
                             Yes/No
                           </option>
@@ -525,7 +327,7 @@ function resetAll() {
 
                     </div>
 
-                    <div v-else-if="documentSpecificMatter === false">
+                    <div v-else-if="state.paths.notArrived.specificMatter === false">
                       <label>
                         <hr />
                         <h4>Has the document been finally checked and approved by the authority or has it otherwise
@@ -533,7 +335,7 @@ function resetAll() {
                           final
                           form?</h4>
                         (I) Ch 2, art 10, ph 1 FPA
-                        <select name="document-other-approved" required v-model="documentOtherApproved">
+                        <select name="document-other-approved" required v-model="state.paths.notArrived.otherApproved">
                           <option selected disabled :value="null">
                             Yes/No
                           </option>
