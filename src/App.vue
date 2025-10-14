@@ -194,6 +194,15 @@ function resetAll() {
   // Path: Record
   documentRiskdagRecord.value = null;
   documentApproved.value = null;
+
+  // Path: Other
+  documentOtherWorkingMaterial.value = null;
+  documentDispatched.value = null;
+  documentSpecificMatter.value = null;
+  documentOtherApproved.value = null;
+  documentMemoranda.value = null;
+  documentSettled.value = null;
+  doucmentArchived.value = null;
 }
 
 </script>
