@@ -367,7 +367,7 @@ function resetAll() {
                 </ul>
                 <select name="document-working-material" required v-model="documentType">
                   <option selected disabled :value="null">
-                    Yes/No
+                    Choose...
                   </option>
                   <option :value="type.Ledger">Ledger*</option>
                   <option :value="type.CourtRuling">Court Ruling*</option>
