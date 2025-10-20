@@ -111,7 +111,7 @@ const chevronIcon = computed(() => ICON_SVGS.chevronDown);
 .alert-content-wrapper {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease-out;
+    transition: max-height 0.1s ease-out;
 }
 
 .alert-content {
