@@ -11,15 +11,12 @@ const documentType = docType
 <template>
   <header>
     <br />
-    <h1>Rules-as-Code (RaC) - Is This A Public Document?</h1>
+    <h1>Rules-as-Code (RaC) - Is This An Official Document?</h1>
   </header>
   <main class="container">
-    <h3>Answer the following questions to classify this document as public or not.</h3>
-    <Alert
-      type="info"
-      title="This only applies for writings and images"
-      description="This tool only evaluates writings and images for whether they are to be considered official. (Ch 2 art 4 and 10 FPA)"
-    />
+    <h3>Answer the following questions to classify this document as official or not.</h3>
+    <Alert type="info" title="This only applies for writings and images"
+      description="This tool only evaluates writings and images for whether they are to be considered official. (Ch 2 art 4 and 10 FPA)" />
 
     <br />
 
@@ -184,26 +181,14 @@ const documentType = docType
       </div>
     </transition>
 
-    <Alert
-      v-if="documentOfficiality?.is === true"
-      type="success"
-      title="The document is official"
-      :description="documentOfficiality?.reason"
-    />
+    <Alert v-if="documentOfficiality?.is === true" type="success" title="The document is official"
+      :description="documentOfficiality?.reason" />
 
-    <Alert
-      v-if="documentOfficiality?.is === false"
-      type="error"
-      title="The document is not official"
-      :description="documentOfficiality?.reason"
-    />
+    <Alert v-if="documentOfficiality?.is === false" type="error" title="The document is not official"
+      :description="documentOfficiality?.reason" />
 
-    <Alert
-      v-if="documentOfficiality?.outOfScope === true"
-      type="info"
-      title="The document is out of scope"
-      :description="documentOfficiality?.reason"
-    />
+    <Alert v-if="documentOfficiality?.outOfScope === true" type="info" title="The document is out of scope"
+      :description="documentOfficiality?.reason" />
 
     <hr />
 
