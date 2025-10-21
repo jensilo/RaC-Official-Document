@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue';
+import { reactive, computed } from 'vue'
 
 interface officiality {
   is: boolean | null
@@ -14,16 +14,16 @@ enum docType {
 }
 
 interface DocumentState {
-  heldByAuthority: boolean | null;
-  docTypeChoice: docType | null;
-  readyForNotation: boolean | null;
-  decisionAnnounced: boolean | null;
-  riskdagRecord: boolean | null;
-  approved: boolean | null;
-  dispatched: boolean | null;
-  specificMatter: boolean | null;
-  otherApproved: boolean | null;
-  settled: boolean | null;
+  heldByAuthority: boolean | null
+  docTypeChoice: docType | null
+  readyForNotation: boolean | null
+  decisionAnnounced: boolean | null
+  riskdagRecord: boolean | null
+  approved: boolean | null
+  dispatched: boolean | null
+  specificMatter: boolean | null
+  otherApproved: boolean | null
+  settled: boolean | null
 }
 
 // --- Initial State and Helper ---
@@ -39,7 +39,7 @@ const initialState: DocumentState = {
   specificMatter: null,
   otherApproved: null,
   settled: null,
-};
+}
 
 // --- Classification Logic Function (Pure Logic) ---
 
@@ -50,30 +50,45 @@ function genericReason(law: string): string {
 // This function performs the core classification based on a static state snapshot
 // It is the most critical part for isolated unit testing.
 function classifyDocument(stateSnapshot: DocumentState): officiality | null {
-  const { heldByAuthority, docTypeChoice, readyForNotation, decisionAnnounced, riskdagRecord, approved, dispatched, specificMatter, otherApproved, settled } = stateSnapshot;
+  const {
+    heldByAuthority,
+    docTypeChoice,
+    readyForNotation,
+    decisionAnnounced,
+    riskdagRecord,
+    approved,
+    dispatched,
+    specificMatter,
+    otherApproved,
+    settled,
+  } = stateSnapshot
 
   // Initial exclusion/scope checks
   if (heldByAuthority === false) {
-    return { is: false, outOfScope: false, reason: 'Document must be held by authority or public body (see Ch 2, art 4 FPA).' };
+    return {
+      is: false,
+      outOfScope: false,
+      reason: 'Document must be held by authority or public body (see Ch 2, art 4 FPA).',
+    }
   }
 
   if (heldByAuthority === null) {
-    return null;
+    return null
   }
 
   if (docTypeChoice === docType.Ledger) {
     if (readyForNotation === true) {
-      return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 1 FPA') };
+      return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 1 FPA') }
     } else if (readyForNotation === false) {
-      return { is: false, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 1 FPA') };
+      return { is: false, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 1 FPA') }
     }
   }
 
   if (docTypeChoice === docType.CourtRuling) {
     if (decisionAnnounced === true) {
-      return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 2 FPA') };
+      return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 2 FPA') }
     } else if (decisionAnnounced === false) {
-      return { is: false, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 2 FPA') };
+      return { is: false, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 2 FPA') }
     }
   }
 
@@ -83,49 +98,53 @@ function classifyDocument(stateSnapshot: DocumentState): officiality | null {
     }
 
     if (approved === true) {
-      return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 3 FPA') };
+      return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 3 FPA') }
     } else if (approved === false) {
-      return { is: false, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 3 FPA') };
+      return { is: false, outOfScope: false, reason: genericReason('Ch 2, art 10 ph 2 p. 3 FPA') }
     }
   }
 
   if (docTypeChoice === docType.Other) {
     if (dispatched === true) {
-      return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 4 and 10 ph. 1 FPA') };
+      return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 4 and 10 ph. 1 FPA') }
     } else if (dispatched === null) {
-      return null;
+      return null
     }
 
     if (specificMatter === true) {
       if (settled === true) {
-        return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 4 and 10 ph. 1 FPA') };
+        return {
+          is: true,
+          outOfScope: false,
+          reason: genericReason('Ch 2, art 4 and 10 ph. 1 FPA'),
+        }
       } else if (settled === false) {
-        return { is: false, outOfScope: false, reason: genericReason('Ch 2, art 4 and 10 FPA') };
+        return { is: false, outOfScope: false, reason: genericReason('Ch 2, art 4 and 10 FPA') }
       }
     } else if (specificMatter === false) {
       if (otherApproved === true) {
-        return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 4 and 10 FPA') };
+        return { is: true, outOfScope: false, reason: genericReason('Ch 2, art 4 and 10 FPA') }
       } else if (otherApproved === false) {
-        return { is: false, outOfScope: false, reason: genericReason('Ch 2, art 4 and 10 FPA') };
+        return { is: false, outOfScope: false, reason: genericReason('Ch 2, art 4 and 10 FPA') }
       }
     }
   }
 
-  return null;
+  return null
 }
 
 // --- Composable: useDocumentOfficiality ---
 
 export function useDocumentOfficiality() {
-  const state = reactive<DocumentState>({ ...initialState });
+  const state = reactive<DocumentState>({ ...initialState })
 
   const documentOfficiality = computed<officiality | null>(() => {
-    return classifyDocument(state);
-  });
+    return classifyDocument(state)
+  })
 
   function resetAll() {
     // Use Object.assign to reset the reactive object's properties, maintaining reactivity
-    Object.assign(state, initialState);
+    Object.assign(state, initialState)
   }
 
   // Also export the static interfaces and enums for consumers (e.g., tests)
@@ -134,9 +153,9 @@ export function useDocumentOfficiality() {
     documentOfficiality,
     resetAll,
     docType,
-    initialState
-  };
+    initialState,
+  }
 }
 
 // Export the pure logic function for easy unit testing without Vue's reactivity wrapper
-export { classifyDocument, docType, type officiality, type DocumentState };
+export { classifyDocument, docType, type officiality, type DocumentState }
