@@ -14,8 +14,8 @@ const documentType = docType
     <h1>Rules-as-Code (RaC) - Is This An Official Document?</h1>
   </header>
   <main class="container">
-    <h3>Answer the following questions to classify this document as official or not.</h3>
-    <Alert type="info" title="This only applies for writings and images"
+    <h3>Answer the following questions to classify this document as official or not:</h3>
+    <Alert type="info" title="The scope applies for writings and images"
       description="This tool only evaluates writings and images for whether they are to be considered official. (Ch 2 art 4 and 10 FPA)" />
     <br />
 
@@ -199,7 +199,7 @@ const documentType = docType
   <footer>
     <h5>
       This application was developed as a part of the coursework to RaC applications at Karlstad
-      universitet.
+      Universitet.
     </h5>
     <br />
     <br />
