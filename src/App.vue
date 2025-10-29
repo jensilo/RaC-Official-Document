@@ -14,9 +14,9 @@ const documentType = docType
     <h1>Rules-as-Code (RaC) - Is This An Official Document?</h1>
   </header>
   <main class="container">
-    <h3>Answer the following questions to classify this document as official or not:</h3>
+    <h3>Answer the following questions to classify your document as official or not:</h3>
     <Alert type="info" title="The scope applies for writings and images"
-      description="This tool only evaluates writings and images for whether they are to be considered official. (Ch 2 art 4 and 10 FPA)" />
+      description="This tool only evaluates writings and images for whether they are to be considered official according to Ch 2 art 4 and 10 FPA)" />
     <br />
 
     <label>
@@ -208,136 +208,108 @@ const documentType = docType
 </template>
 
 <style scoped>
-/* General layout */
+/* Pico.css adaptation for RaC document classification tool */
+
+/* Layout */
 body {
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  background-color: #f7f9fc;
-  margin: 0;
-  padding: 0;
-  color: #333333;
+  background-color: var(--pico-background-color);
+  color: var(--pico-color);
 }
 
 header {
-  background-color: #2c3e50;
-  color: #fff;
-  padding: 1rem 2rem;
   text-align: center;
-  border-bottom: 4px solid #1abc9c;
+  padding: var(--pico-spacing);
+  background-color: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+  border-bottom: 1px solid var(--pico-muted-border-color);
 }
 
 header h1 {
-  font-size: 1.6rem;
-  margin: 0;
+  margin-bottom: 0.3rem;
+  font-size: 1.6rem; /* smaller main title */
+  font-weight: 700;
 }
 
-.container {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 1.5rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+main.container {
+  max-width: 800px;
+  margin: var(--pico-spacing) auto;
+  padding: var(--pico-spacing);
 }
 
-/* Section spacing */
+/* Typography */
+
 h3 {
-  margin-bottom: 1rem;
-  color: #2c3e50;
+  font-size: 1.4rem; /* smaller subheader */
+  font-weight: 550;
+  margin-top: 0.5rem;
+  color: var(--pico-color);
 }
 
 h4 {
   margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: #34495e;
+  color: var(--pico-color);
 }
 
-li{
-  color: #525050;
-  font-size: smaller;
+ul li {
+  color: var(--pico-muted-color);
+  font-size: 0.9rem;
 }
 
-label, select {
+/* Labels and inputs */
+label {
   display: block;
-  margin-bottom: 1rem;
-}
-
-label{
-  color: #525050;
-  font-size: smaller;
+  margin: 1rem 0;
+  font-weight: 500;
+  color: var(--pico-color);
 }
 
 select {
   width: 100%;
   max-width: 400px;
-  padding: 0.4rem;
-  border: 1px solid #3e3a3a;
-  border-radius: 6px;
-  background: #fafafa;
-  transition: border-color 0.2s;
-  color:#404441;
+  margin-top: 0.3rem;
 }
 
-select:focus {
-  border-color: #1abc9c;
-  outline: none;
+/* Alerts — integrate with Pico’s color system */
+:deep(.alert.info .alert-content p) {
+  background: var(--pico-muted-background);
+  border-left: 3px solid var(--pico-info);
+  padding: 0.75rem;
+  border-radius: var(--pico-border-radius);
 }
 
-/* Alerts */
-.alert-box {
-  margin: 1rem 0;
-  padding: 1rem;
-  border-radius: 6px;
-  font-size: 0.95rem;
+:deep(.alert.success .alert-content p) {
+  background: var(--pico-muted-background);
+  border-left: 3px solid var(--pico-success);
+  padding: 0.75rem;
+  border-radius: var(--pico-border-radius);
 }
 
-:deep(.alert.info .alert-content p ){
-  background: #fdecea;
-  color: #424342 !important;
-  border-left: 5px solid #2918ec;
-}
-
-:deep(.alert.success .alert-content p ) {
-  background: #eafaf1;
-  border-left: 5px solid #27ae60;
-  color: #424342 !important;
-}
-
-:deep(.alert.error  .alert-content p ) {
-  background: #fdecea;
-  border-left: 5px solid #e74c3c;
-   color: #424342 !important;
+:deep(.alert.error .alert-content p) {
+  background: var(--pico-muted-background);
+  border-left: 3px solid var(--pico-danger);
+  padding: 0.75rem;
+  border-radius: var(--pico-border-radius);
 }
 
 /* Buttons */
 button {
-  background-color: #1e4247;
-  color: #fff;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-button:hover {
-  background-color: #16a085;
+  margin-top: 1rem;
 }
 
 /* Footer */
 footer {
   text-align: center;
+  font-size: 0.9rem;
+  color: var(--pico-muted-color);
   margin-top: 2rem;
-  padding: 1rem;
-  font-size: 0.85rem;
-  color: #777;
-  border-top: 1px solid #ddd;
+  padding-top: 1rem;
+  border-top: 1px solid var(--pico-muted-border-color);
 }
 
 /* Transitions */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease-in;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .fade-enter-from,

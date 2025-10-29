@@ -44,7 +44,7 @@ const initialState: DocumentState = {
 // --- Classification Logic Function (Pure Logic) ---
 
 function genericReason(law: string): string {
-  return `see ${law} for further information on this concrete matter.`
+  return `See ${law} for further information on this concrete matter.`
 }
 
 // This function performs the core classification based on a static state snapshot
@@ -68,7 +68,7 @@ function classifyDocument(stateSnapshot: DocumentState): officiality | null {
     return {
       is: false,
       outOfScope: false,
-      reason: 'Document must be held by authority or public body (see Ch 2, art 4 FPA).',
+      reason: 'Document must be held by authority or public body (See Ch 2, art 4 FPA).',
     }
   }
 
