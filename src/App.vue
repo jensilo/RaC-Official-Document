@@ -10,14 +10,12 @@ const documentType = docType
 
 <template>
   <header>
-    <br />
     <h1>Rules-as-Code (RaC) - Is This An Official Document?</h1>
   </header>
   <main class="container">
     <h3>Answer the following questions to classify your document as official or not:</h3>
-    <Alert type="info" title="The scope applies for writings and images"
+    <Alert style="margin-bottom: 3em;" type="info" title="The scope applies for writings and images"
       description="This tool only evaluates writings and images for whether they are to be considered official according to Ch 2 art 4 and 10 FPA" />
-    <br />
 
     <label>
       <h4>Is the document held by a public authority?</h4>
@@ -198,8 +196,7 @@ const documentType = docType
   </main>
   <footer>
     <h5>
-      This application was developed as a part of the coursework to RaC applications at Karlstad
-      Universitet.
+      This application was developed as a part of the coursework to RaC applications at Karlstad universitet.
     </h5>
     <br />
     <br />
@@ -222,9 +219,10 @@ header {
 }
 
 header h1 {
-  margin-bottom: 0.3rem;
+  margin: 1rem 0;
   font-size: 1.6rem;
   font-weight: 700;
+  color: var(--pico-primary-inverse);
 }
 
 main.container {
@@ -268,6 +266,7 @@ select {
   width: 100%;
   max-width: 400px;
   margin-top: 0.3rem;
+  display: block;
 }
 
 /* Alerts */
