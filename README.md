@@ -1,5 +1,7 @@
 # Rules-as-Code (RaC) - Is This A Public Document?
 
+[Available as a static page on GitHub](https://jensilo.github.io/RaC-Official-Document/)
+
 This project is a web application that helps determine if a document is considered "public" under the Swedish Freedom of the Press Act (FPA). It guides the user through a series of questions based on the FPA to classify a document.
 
 ![Screenshot of the RaC application.](app.png)
